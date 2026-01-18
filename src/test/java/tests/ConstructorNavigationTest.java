@@ -41,31 +41,5 @@ public class ConstructorNavigationTest extends BaseTest {
         assertTrue(mainPage.isTabActive("Булки"));
         assertTrue(mainPage.isSectionHeaderVisible("Булки"));
     }
-//Опциональная проверка
- //  @Test
- //  @DisplayName("Проверка полного цикла переходов")
- //   @Description("Тест проверяет полный цикл переходов между всеми вкладками конструктора: " +
- //           "Соусы → Начинки → Булки → Соусы → Начинки → Булки")
- //  public void constructorSectionsNavigationTest() {
- //      assertTrue(mainPage.isOpened());
 
- //      mainPage.clickSaucesTab();
- //      assertTrue(mainPage.isTabActive("Соусы"));
-
- //      mainPage.clickFillingsTab();
- //      assertTrue(mainPage.isTabActive("Начинки"));
-
- //      mainPage.clickBunsTab();
- //      assertTrue(mainPage.isTabActive("Булки"));
-
- //      // Дополнительный цикл
- //      mainPage.clickSaucesTab();
- //      assertTrue(mainPage.isTabActive("Соусы"));
-
- //      mainPage.clickFillingsTab();
- //      assertTrue(mainPage.isTabActive("Начинки"));
-
- //      mainPage.clickBunsTab();
- //      assertTrue(mainPage.isTabActive("Булки"));
- //  }
 }

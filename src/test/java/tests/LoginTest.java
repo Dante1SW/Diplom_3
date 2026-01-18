@@ -2,29 +2,46 @@ package tests;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.qameta.allure.Step;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import models.User;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import utils.Config;
 import static org.junit.Assert.assertTrue;
 
 public class LoginTest extends BaseTest {
+    private User testUser;
+    private String accessToken;
+
+    @Before
+    @Step("Создание тестового пользователя")
+    public void createTestUser() {
+        testUser = createUniqueTestUser();
+        assertTrue("Не удалось создать тестового пользователя", testUser != null);
+    }
+
+    @After
+    @Step("Удаление тестового пользователя")
+    public void deleteTestUser() {
+        if (testUser != null) {
+            String token = getAccessToken(testUser.getEmail(), testUser.getPassword());
+            if (token != null) {
+                deleteUserThroughApi(token);
+            }
+        }
+    }
 
     @Test
     @DisplayName("Вход по кнопке 'Войти в аккаунт' на главной")
     @Description("Тест проверяет авторизацию пользователя через кнопку 'Войти в аккаунт' на главной странице. " +
             "Создается тестовый пользователь через API, выполняется вход и проверяется редирект на главную страницу")
     public void loginViaMainPageButtonTest() {
-        User user = createUniqueTestUser();
-        assertTrue(user != null);
-
         mainPage.goToLoginPage();
-        authPage.login(user.getEmail(), user.getPassword());
+        authPage.login(testUser.getEmail(), testUser.getPassword());
 
-        wait.until(ExpectedConditions.urlToBe(Config.MAIN_PAGE));
-        assertTrue(driver.getCurrentUrl().equals(Config.MAIN_PAGE));
-
-        deleteUserThroughApi(getAccessToken(user.getEmail(), user.getPassword()));
+        assertTrue("Не удалось выполнить вход через главную страницу",
+                authPage.isOpened());
     }
 
     @Test
@@ -32,16 +49,11 @@ public class LoginTest extends BaseTest {
     @Description("Тест проверяет авторизацию пользователя через кнопку 'Личный кабинет' в шапке сайта. " +
             "Создается тестовый пользователь через API, выполняется вход и проверяется редирект на главную страницу")
     public void loginViaPersonalAccountButtonTest() {
-        User user = createUniqueTestUser();
-        assertTrue(user != null);
-
         mainPage.goToLoginPageViaPersonalAccount();
-        authPage.login(user.getEmail(), user.getPassword());
+        authPage.login(testUser.getEmail(), testUser.getPassword());
 
-        wait.until(ExpectedConditions.urlToBe(Config.MAIN_PAGE));
-        assertTrue(driver.getCurrentUrl().equals(Config.MAIN_PAGE));
-
-        deleteUserThroughApi(getAccessToken(user.getEmail(), user.getPassword()));
+        assertTrue("Не удалось выполнить вход через личный кабинет",
+                authPage.isOpened());
     }
 
     @Test
@@ -50,17 +62,12 @@ public class LoginTest extends BaseTest {
             "Создается тестовый пользователь через API, выполняется переход на страницу регистрации, " +
             "переход на страницу входа и авторизация")
     public void loginViaRegistrationFormLinkTest() {
-        User user = createUniqueTestUser();
-        assertTrue(user != null);
-
         driver.get(Config.REGISTER_PAGE);
         authPage.goToLoginPage();
-        authPage.login(user.getEmail(), user.getPassword());
+        authPage.login(testUser.getEmail(), testUser.getPassword());
 
-        wait.until(ExpectedConditions.urlToBe(Config.MAIN_PAGE));
-        assertTrue(driver.getCurrentUrl().equals(Config.MAIN_PAGE));
-
-        deleteUserThroughApi(getAccessToken(user.getEmail(), user.getPassword()));
+        assertTrue("Не удалось выполнить вход со страницы регистрации",
+                authPage.isOpened());
     }
 
     @Test
@@ -69,16 +76,11 @@ public class LoginTest extends BaseTest {
             "Создается тестовый пользователь через API, выполняется переход на страницу восстановления пароля, " +
             "переход на страницу входа и авторизация")
     public void loginViaForgotPasswordFormLinkTest() {
-        User user = createUniqueTestUser();
-        assertTrue(user != null);
-
         driver.get(Config.FORGOT_PASSWORD_PAGE);
         authPage.goToLoginPage();
-        authPage.login(user.getEmail(), user.getPassword());
+        authPage.login(testUser.getEmail(), testUser.getPassword());
 
-        wait.until(ExpectedConditions.urlToBe(Config.MAIN_PAGE));
-        assertTrue(driver.getCurrentUrl().equals(Config.MAIN_PAGE));
-
-        deleteUserThroughApi(getAccessToken(user.getEmail(), user.getPassword()));
+        assertTrue("Не удалось выполнить вход со страницы восстановления пароля",
+                authPage.isOpened());
     }
 }

@@ -2,13 +2,25 @@ package tests;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.qameta.allure.Step;
+import org.junit.After;
 import org.junit.Test;
-
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
 import static org.junit.Assert.assertTrue;
 
 public class RegistrationTest extends BaseTest {
+    private String testEmail;
+    private String testPassword;
+
+    @After
+    @Step("Удаление тестового пользователя после регистрации")
+    public void deleteTestUserAfterRegistration() {
+        if (testEmail != null && testPassword != null) {
+            String token = getAccessToken(testEmail, testPassword);
+            if (token != null) {
+                deleteUserThroughApi(token);
+            }
+        }
+    }
 
     @Test
     @DisplayName("Успешная регистрация")
@@ -17,18 +29,16 @@ public class RegistrationTest extends BaseTest {
             "Созданный пользователь удаляется через API для очистки тестовых данных")
     public void successfulRegistrationTest() {
         String timestamp = String.valueOf(System.currentTimeMillis());
-        String email = "testuser" + timestamp + "@example.com";
-        String password = "Password" + timestamp;
+        testEmail = "testuser" + timestamp + "@example.com";
+        testPassword = "Password" + timestamp;
         String name = "TestUser" + timestamp;
 
         mainPage.goToLoginPage();
         authPage.goToRegistrationPage();
-        authPage.register(name, email, password);
+        authPage.register(name, testEmail, testPassword);
 
-        wait.until(ExpectedConditions.urlContains("/login"));
-        assertTrue(driver.getCurrentUrl().contains("/login"));
-
-        deleteUserThroughApi(getAccessToken(email, password));
+        assertTrue("Не удалось зарегистрировать пользователя",
+                authPage.isLoginPageOpened());
     }
 
     @Test
